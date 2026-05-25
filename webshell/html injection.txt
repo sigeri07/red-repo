@@ -1,0 +1,23 @@
+<style>
+#overlay{
+  position:fixed;
+  inset:0;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+#overlay a{
+  color:#000;
+  text-decoration:none;
+  font:700 40px sans-serif;
+}
+</style>
+
+<div id="overlay">
+  <a href="https://example.com">
+    promo gratis buka tabungan di SecureBank klik disini
+  </a>
+</div>
