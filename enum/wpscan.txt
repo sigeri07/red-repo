@@ -1,0 +1,5 @@
+wpscan --url https://xxx/wp/ \
+--api-token xxx \
+--enumerate ap,at \
+--plugins-detection aggressive \
+--themes-detection aggressive
