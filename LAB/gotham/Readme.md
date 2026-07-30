@@ -154,7 +154,12 @@ net localgroup Administrators gotham\hugo /add
 ```
 
 ---
+# CLM
 
+```cmd
+reg query "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v __PSLockdownPolicy
+```
+---
 # ACL Misconfiguration
 
 ## Riddler → GenericWrite on Hugo
