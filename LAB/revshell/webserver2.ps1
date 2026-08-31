@@ -5,6 +5,7 @@ function webserver {
     )
     $PID | Out-File -FilePath $pidfile -Force
     Write-Host "[*] PID $PID saved to $pidfile"
+    Write-Host "[*] Kill command: Stop-Process -Id $saved -Force" -ForegroundColor Gray
     $s=[Net.HttpListener]::new()
     $s.Prefixes.Add("http://+:$port/")
     $s.Start()
