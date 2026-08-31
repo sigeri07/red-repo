@@ -9,7 +9,7 @@ function webserver {
     $s=[Net.HttpListener]::new()
     $s.Prefixes.Add("http://+:$port/")
     $s.Start()
-    Write-Host "Listening http://+:$port/ (GET /exit to stop)"
+    Write-Host "[*] Listening $port/ (GET /exit to stop)"
     try {
         while($c=$s.GetContext()){
             $r=$c.Response
@@ -44,5 +44,3 @@ function webserver {
         Write-Host "Server stopped."
     }
 }
-
-webserver -port 80
